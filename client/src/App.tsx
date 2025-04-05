@@ -1,22 +1,29 @@
-import { Routes, Route } from 'react-router-dom'
-import HomePage from './pages/home'
-import "slick-carousel/slick/slick.css"; 
-import "slick-carousel/slick/slick-theme.css";
-
-// Puedes añadir más páginas aquí conforme las crees
-// import LoginPage from './pages/LoginPage'
-// import RegisterPage from './pages/RegisterPage'
+import { Routes, Route } from 'react-router-dom';
+import HomePage from './pages/home';
+import Register from './pages/register';
+import ProtectedRoute from './components/ProtectedRoute';
+import Dashboard from './pages/dashboard';
+import Login from './pages/login';
 
 const App = () => {
   return (
-    <div className="min-h-screen bg-white text-gray-900 dark:bg-gray-900 dark:text-white">
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        {/* <Route path="/login" element={<LoginPage />} /> */}
-        {/* <Route path="/register" element={<RegisterPage />} /> */}
-      </Routes>
-    </div>
-  )
-}
+      <div className="min-h-screen bg-white text-gray-900 dark:bg-gray-900 dark:text-white">
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/login" element={<Login />} />
+          {/* Ruta protegida para el Dashboard */}
+          <Route 
+            path="/dashboard" 
+            element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            } 
+          />
+        </Routes>
+      </div>
+  );
+};
 
-export default App
+export default App;

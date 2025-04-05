@@ -14,15 +14,18 @@ const Navbar = () => {
 
         {/* Center links (Desktop) */}
         <div className="hidden md:flex absolute left-1/2 transform -translate-x-1/2 space-x-8">
-          <Link to="/" className="hover:text-yellow-400">
+          <a href="#inicio" className="hover:text-yellow-400">
             Inicio
-          </Link>
-          <Link to="/eventos" className="hover:text-yellow-400">
+          </a>
+          <a href="#eventos" className="hover:text-yellow-400">
             Eventos
-          </Link>
-          <Link to="/historial" className="hover:text-yellow-400">
-            Historial
-          </Link>
+          </a>
+          <a href="#beneficios" className="hover:text-yellow-400">
+            Beneficios
+          </a>
+          <a href="#faq" className="hover:text-yellow-400">
+            Preguntas Frecuentes
+          </a>
         </div>
 
         {/* Right buttons */}
@@ -34,7 +37,7 @@ const Navbar = () => {
             Iniciar Sesión
           </Link>
           <Link
-            to="/registro"
+            to="/register"
             className="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-2 px-4 rounded"
           >
             Registrarse
@@ -64,10 +67,22 @@ const Navbar = () => {
       {/* Mobile Menu */}
       {isOpen && (
         <div className="md:hidden px-4 pb-4 space-y-2">
-          <Link to="/" className="block hover:text-yellow-400">Inicio</Link>
-          <Link to="/eventos" className="block hover:text-yellow-400">Eventos</Link>
-          <Link to="/historial" className="block hover:text-yellow-400">Historial</Link>
-          <hr/>
+          <a href="#inicio" className="hover:text-yellow-400">
+            Inicio
+          </a>
+          <br/>
+          <a href="#eventos" className="hover:text-yellow-400">
+            Eventos
+          </a>
+          <br/>
+          <a href="#beneficios" className="hover:text-yellow-400">
+            Beneficios
+          </a>
+          <br/>
+          <a href="#faq" className="hover:text-yellow-400">
+            Preguntas Frecuentes
+          </a>
+          <hr />
           <Link to="/login" className="block hover:text-yellow-400">Iniciar Sesión</Link>
           <Link to="/registro" className="block hover:text-yellow-400">Registrarse</Link>
         </div>
