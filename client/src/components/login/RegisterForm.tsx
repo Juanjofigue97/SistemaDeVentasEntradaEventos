@@ -1,6 +1,8 @@
 // src/components/RegisterForm.tsx
 import { useState } from 'react';
 import axios from 'axios';
+import { Link } from 'react-router-dom';
+import logo from "/Eventia.png";
 
 const RegisterForm = () => {
   const [nombre, setNombre] = useState('');
@@ -41,10 +43,12 @@ const RegisterForm = () => {
     <div className="min-h-screen flex justify-center items-center">
       <div className="w-full max-w-md bg-white p-8 rounded-lg shadow-lg">
         {/* Logo/Icono */}
-        <div className="text-center mb-6">
-          <i className="text-6xl text-yellow-500 fas fa-user-circle"></i>
+        <div className="flex justify-center">
+          <Link to="/" className="">
+            <img src={logo} alt="logo" className="h-30 w-auto" />
+          </Link>
         </div>
-
+        <br/>
         <h2 className="text-2xl font-bold mb-4 text-center text-gray-800">Regístrate</h2>
         {error && <div className="text-red-500 mb-4">{error}</div>}
         <form onSubmit={handleSubmit}>

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { FaUserCircle } from "react-icons/fa";
 import { useAuth } from "../../context/AuthContext";
+import logo from "/EventiaDark.png";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -11,8 +12,8 @@ const Navbar = () => {
     <nav className="bg-gray-900 border-b border-gray-700 text-white">
       <div className="max-w-screen-xl mx-auto flex items-center justify-between p-4 relative">
         {/* Logo */}
-        <Link to="/" className="text-2xl font-bold">
-          🎫 Eventia
+        <Link to="/" className="flex items-center">
+          <img src={logo} alt="logo" className="h-20 w-auto" />
         </Link>
 
         {/* Center links (Desktop) */}
