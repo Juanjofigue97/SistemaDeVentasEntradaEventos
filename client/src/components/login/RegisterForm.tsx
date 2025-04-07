@@ -38,7 +38,7 @@ const RegisterForm = () => {
   };
 
   return (
-    <div className="bg-gray-900 min-h-screen flex justify-center items-center">
+    <div className="min-h-screen flex justify-center items-center">
       <div className="w-full max-w-md bg-white p-8 rounded-lg shadow-lg">
         {/* Logo/Icono */}
         <div className="text-center mb-6">
