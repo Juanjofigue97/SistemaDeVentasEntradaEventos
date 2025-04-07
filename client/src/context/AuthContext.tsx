@@ -1,46 +1,53 @@
-// context/AuthContext.tsx
+// src/context/AuthContext.tsx
+import { createContext, useContext, useEffect, useState } from "react";
 
-import { createContext, useContext, ReactNode, useState } from 'react';
+type Role = "admin" | "user";
+
+interface User {
+  email: string;
+  role: Role;
+}
 
 interface AuthContextType {
-  user: any; // El tipo de usuario puede variar dependiendo de tu implementación
-  login: () => void;
+  user: User | null;
+  login: (userData: User) => void;
   logout: () => void;
+  isLoading: boolean; // 👈 nuevo
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<any>({
-    email: 'testuser@example.com',
-    name: 'Test User',
-  }); // Aquí simulamos un usuario autenticado por defecto
+export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
+  const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Si necesitas simular que el usuario no está autenticado, solo pon `null` o un valor vacío aquí
-  // const [user, setUser] = useState<any>(null);
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
+    setIsLoading(false); // 👈 cuando termina de cargar
+  }, []);
 
-  const login = () => {
-    setUser({
-      email: 'testuser@example.com',
-      name: 'Test User',
-    }); // Simula un login
+  const login = (userData: User) => {
+    setUser(userData);
+    localStorage.setItem("user", JSON.stringify(userData));
   };
 
   const logout = () => {
-    setUser(null); // Simula el logout
+    setUser(null);
+    localStorage.removeItem("user");
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider value={{ user, login, logout, isLoading }}>
       {children}
     </AuthContext.Provider>
   );
 };
 
-export const useAuth = (): AuthContextType => {
+export const useAuth = () => {
   const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth debe ser usado dentro de un AuthProvider');
-  }
+  if (!context) throw new Error("useAuth must be used within AuthProvider");
   return context;
 };

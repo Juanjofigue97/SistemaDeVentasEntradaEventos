@@ -4,6 +4,7 @@ import Register from './pages/register';
 import ProtectedRoute from './components/ProtectedRoute';
 import Dashboard from './pages/dashboard';
 import Login from './pages/login';
+import AuthRequired from './pages/AuthRequired';
 
 const App = () => {
   return (
@@ -12,7 +13,7 @@ const App = () => {
           <Route path="/" element={<HomePage />} />
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} />
-          {/* Ruta protegida para el Dashboard */}
+          <Route path="/auth-required" element={<AuthRequired />} />
           <Route 
             path="/dashboard" 
             element={

@@ -1,16 +1,31 @@
-// src/components/LoginForm.tsx
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom'; // Importamos Link para el enrutamiento
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
+import Swal from 'sweetalert2';
+import { authenticateUser } from '../../services/authService';
 
 const LoginForm = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  
-  const handleSubmit = (e: React.FormEvent) => {
+  const { login } = useAuth();
+  const navigate = useNavigate();
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Aquí iría la lógica de autenticación con el backend
-    console.log('Email:', email);
-    console.log('Password:', password);
+
+    const result = authenticateUser(email, password);
+
+    if (result.success && result.role) {
+      login({ email, role: "admin" });
+      navigate("/dashboard");
+    } else {
+      Swal.fire({
+        icon: 'error',
+        title: '¡Error!',
+        text: result.message || 'Error desconocido',
+        confirmButtonColor: '#facc15',
+      });
+    }
   };
 
   return (
