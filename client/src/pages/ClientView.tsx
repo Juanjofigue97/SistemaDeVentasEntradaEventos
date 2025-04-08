@@ -11,7 +11,7 @@ const ClientView = () => {
 
   return (
     <div className="text-center">
-      <h2 className="text-2xl">Bienvenido, {user.name}</h2>
+      <h2 className="text-2xl">Bienvenido, {user.email}</h2>
       <p>¡Este es tu dashboard de cliente!</p>
       <button
         onClick={logout}

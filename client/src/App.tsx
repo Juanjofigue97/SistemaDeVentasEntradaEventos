@@ -2,8 +2,9 @@ import { Routes, Route } from 'react-router-dom';
 import HomePage from './pages/home';
 import Register from './pages/register';
 import Login from './pages/login';
-import DashboardPage from './pages/dashboard';
-import CompraEntradaForm from './components/user/comprar_entrada';
+import AuthRequired from './pages/AuthRequired';
+import ProtectedRoute from './components/ProtectedRoute';
+import Dashboard from './pages/dashboard';
 
 const App = () => {
   return (
@@ -12,8 +13,15 @@ const App = () => {
           <Route path="/" element={<HomePage />} />
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/dashboard" element={<DashboardPage />} />
-          <Route path="/comprar-entrada/:id" element={<CompraEntradaForm />} />
+          <Route path="/auth-required" element={<AuthRequired />} />
+          <Route 
+            path="/dashboard" 
+            element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            } 
+          />
         </Routes>
       </div>
   );
