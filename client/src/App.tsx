@@ -6,6 +6,7 @@ import AuthRequired from './pages/AuthRequired';
 import ProtectedRoute from './components/ProtectedRoute';
 import Dashboard from './pages/dashboard';
 import CompraEntradaForm from './components/user/comprar_entrada';
+import Logout from './pages/logout';
 
 const App = () => {
   return (
@@ -14,6 +15,7 @@ const App = () => {
         <Route path="/" element={<HomePage />} />
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/logout" element={<Logout />} />
         <Route path="/auth-required" element={<AuthRequired />} />
         <Route
           path="/dashboard"

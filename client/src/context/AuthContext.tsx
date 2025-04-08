@@ -1,18 +1,21 @@
 // src/context/AuthContext.tsx
 import { createContext, useContext, useEffect, useState } from "react";
+import {jwtDecode} from "jwt-decode";
 
 type Role = "admin" | "user";
 
 interface User {
   email: string;
   role: Role;
+  token: string;
 }
 
 interface AuthContextType {
   user: User | null;
-  login: (userData: User) => void;
+  login: (token: string, email: string) => void;
   logout: () => void;
-  isLoading: boolean; // 👈 nuevo
+  isLoading: boolean;
+  setUser: React.Dispatch<React.SetStateAction<User | null>>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -26,25 +29,38 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     if (storedUser) {
       setUser(JSON.parse(storedUser));
     }
-    setIsLoading(false); // 👈 cuando termina de cargar
+    setIsLoading(false);
   }, []);
 
-  const login = (userData: User) => {
-    setUser(userData);
-    localStorage.setItem("user", JSON.stringify(userData));
+  const login = (token: string, email: string) => {
+    try {
+      const decoded: any = jwtDecode(token);
+      const role: Role = decoded.is_admin ? "admin" : "user";
+      const userData: User = {
+        email,
+        role,
+        token,
+      };
+
+      setUser(userData);
+      localStorage.setItem("user", JSON.stringify(userData));
+    } catch (error) {
+      console.error("Error al decodificar el token", error);
+    }
   };
 
   const logout = () => {
     setUser(null);
     localStorage.removeItem("user");
-    localStorage.setItem("logout", "true"); 
+    localStorage.setItem("logout", "true");
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, isLoading }}>
+    <AuthContext.Provider value={{ user, login, logout, isLoading, setUser }}>
       {children}
     </AuthContext.Provider>
   );
+  
 };
 
 export const useAuth = () => {
