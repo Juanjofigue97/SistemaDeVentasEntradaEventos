@@ -27,6 +27,8 @@ class Event(Base):
     price = Column(Float)
     capacity = Column(Integer)
     tickets_sold = Column(Integer, default=0)
+    image = Column(String)
+    estado = Column(String)
 
     entry_types = relationship("EntryType", back_populates="event", cascade="all, delete")
 
