@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { HiCalendar, HiUser, HiTicket, HiShoppingBag, HiLogout } from "react-icons/hi";
+import { HiCalendar, HiUser, HiTicket, HiShoppingBag } from "react-icons/hi";
 import EventList from "../common/EventList";
 import { Link, useNavigate } from "react-router-dom";
 import logo from "/EventiaDark.png";

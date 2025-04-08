@@ -1,6 +1,6 @@
-import { FormEvent, useState, useEffect } from 'react';
+import { FormEvent, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { FaTicketAlt, FaCalendarAlt, FaClock, FaMapMarkerAlt, FaMoneyBillWave, FaUser, FaCreditCard } from 'react-icons/fa';
+import { FaTicketAlt, FaCalendarAlt, FaMapMarkerAlt, FaMoneyBillWave, FaCreditCard } from 'react-icons/fa';
 
 // Tipos basados en tu estructura
 type Evento = {
