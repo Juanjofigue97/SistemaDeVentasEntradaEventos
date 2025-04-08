@@ -1,16 +1,32 @@
 import { useState } from "react";
 import { HiCalendar, HiUser, HiTicket, HiShoppingBag, HiLogout } from "react-icons/hi";
 import EventList from "../common/EventList";
+import { Link, useNavigate } from "react-router-dom";
+import logo from "/EventiaDark.png";
+import { useAuth } from "../../context/AuthContext";
 
 export default function Dashboard() {
   const [activeTab, setActiveTab] = useState("eventos");
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate("/");    // Redirige a la home
+  };
 
   return (
     <div className="flex h-screen">
       {/* Sidebar */}
       <div className="w-64 bg-gray-700 text-white p-4 border-r border-yellow-500">
-        <h2 className="text-xl font-bold mb-8">EventosApp</h2>
-        
+        <h2 className="text-xl font-bold mb-8">
+          <div className="flex justify-center">
+            <Link to="/" className="">
+              <img src={logo} alt="logo" className="h-30 w-auto" />
+            </Link>
+          </div>
+        </h2>
+
         <nav>
           <ul className="space-y-2">
             <li>
@@ -48,8 +64,11 @@ export default function Dashboard() {
           </ul>
         </nav>
 
-        <button className="flex items-center mt-8 p-2 text-red-300 hover:bg-gray-600 w-full rounded">
-          <HiLogout className="mr-2" /> Cerrar sesión
+        <button
+          onClick={handleLogout}
+          className="border border-red-500 hover:bg-red-500 hover:text-white font-semibold py-2 px-4 rounded"
+        >
+          Cerrar sesión
         </button>
       </div>
 
@@ -63,7 +82,7 @@ export default function Dashboard() {
         </h1>
 
         {activeTab === "eventos" && (
-            <EventList />
+          <EventList />
         )}
 
         {activeTab === "compras" && (
@@ -79,7 +98,12 @@ export default function Dashboard() {
           </div>
         )}
 
-        {/* Añade aquí las otras pestañas */}
+        {activeTab === "perfil" && (
+          <div className="max-w-md border border-yellow-500 rounded-lg p-6">
+            Hola! {user?.email}
+          </div>
+        )}
+
       </main>
     </div>
   );

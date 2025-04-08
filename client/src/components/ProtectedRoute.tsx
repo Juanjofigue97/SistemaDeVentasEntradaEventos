@@ -8,12 +8,17 @@ interface Props {
 
 export default function ProtectedRoute({ children, requiredRole }: Props) {
   const { user, isLoading } = useAuth();
-  
+
   if (isLoading) {
     return <div className="text-center text-white mt-10">Cargando...</div>;
   }
 
   if (!user) {
+    const wasLogout = localStorage.getItem("logout") === "true";
+    if (wasLogout) {
+      localStorage.removeItem("logout"); // 👈 limpiamos para no afectar después
+      return <Navigate to="/" replace />;
+    }
     return <Navigate to="/auth-required" replace />;
   }
 
@@ -23,3 +28,4 @@ export default function ProtectedRoute({ children, requiredRole }: Props) {
 
   return <>{children}</>;
 }
+
