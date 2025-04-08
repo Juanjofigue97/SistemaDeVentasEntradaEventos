@@ -24,3 +24,12 @@ dist-ssr
 *.sw?
 .qodo
 *__pycache__
+
+# Python
+
+venv/
+env/
+.venv/
+.env/
+.env.*
+.env

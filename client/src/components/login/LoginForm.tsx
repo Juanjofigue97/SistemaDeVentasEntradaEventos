@@ -13,11 +13,11 @@ const LoginForm = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const result = authenticateUser(email, password);
+    const result = await authenticateUser(email, password);
 
-    if (result.success && result.role) {
-      login({ email, role: "admin" });
-      navigate("/dashboard");
+    if (result.success && result.token) {
+      login(result.token, email);
+      navigate('/dashboard');
     } else {
       Swal.fire({
         icon: 'error',
