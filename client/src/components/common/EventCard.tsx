@@ -1,4 +1,5 @@
 import { FaMapMarkerAlt } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
 type EventCardProps = {
   id: number;
@@ -25,6 +26,7 @@ const formatTime = (time: string) => {
 };
 
 const EventCard = ({
+  id,
   title,
   date,
   time,
@@ -32,11 +34,27 @@ const EventCard = ({
   image,
   available,
 }: EventCardProps) => {
+  const navigate = useNavigate();
   const { day, month, year } = formatDate(date);
   const { hour, minute } = formatTime(time);
 
+  const handleCardClick = () => {
+    if (available) {
+      navigate(`/comprar-entrada/${id}`, {
+        state: { event: { id, title, date, time, location, image } }
+      });
+    }
+  };
+
   return (
-    <div className="relative bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition duration-300 hover:-translate-y-1 dark:bg-gray-800 max-w-sm mx-auto">
+    <div 
+      onClick={handleCardClick}
+      className={`relative bg-white rounded-2xl overflow-hidden shadow-md transition duration-300 hover:-translate-y-1 dark:bg-gray-800 max-w-sm mx-auto ${
+        available 
+          ? "hover:shadow-xl cursor-pointer hover:border-2 hover:border-yellow-500" 
+          : "opacity-80 cursor-not-allowed"
+      }`}
+    >
       {/* Sold Out etiqueta roja */}
       {!available && (
         <div className="absolute top-0 left-0 bg-red-600 text-white text-xs font-bold px-3 py-1 z-10 rounded-br-lg shadow-md">
@@ -62,7 +80,7 @@ const EventCard = ({
           </h3>
         </div>
 
-        {/* Fecha y hora más cercanas entre sí */}
+        {/* Fecha y hora */}
         <div className="flex justify-center items-center gap-6 text-center text-gray-800 dark:text-gray-100 mt-4">
           <div>
             <p className="text-2xl font-bold">{day}</p>

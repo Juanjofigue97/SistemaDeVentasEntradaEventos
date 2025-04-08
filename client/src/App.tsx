@@ -1,9 +1,9 @@
 import { Routes, Route } from 'react-router-dom';
 import HomePage from './pages/home';
 import Register from './pages/register';
-import ProtectedRoute from './components/ProtectedRoute';
-import Dashboard from './pages/dashboard';
 import Login from './pages/login';
+import DashboardPage from './pages/dashboard';
+import CompraEntradaForm from './components/user/comprar_entrada';
 
 const App = () => {
   return (
@@ -12,15 +12,8 @@ const App = () => {
           <Route path="/" element={<HomePage />} />
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} />
-          {/* Ruta protegida para el Dashboard */}
-          <Route 
-            path="/dashboard" 
-            element={
-              <ProtectedRoute>
-                <Dashboard />
-              </ProtectedRoute>
-            } 
-          />
+          <Route path="/dashboard" element={<DashboardPage />} />
+          <Route path="/comprar-entrada/:id" element={<CompraEntradaForm />} />
         </Routes>
       </div>
   );
