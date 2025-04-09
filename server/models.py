@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, DateTime, Float
+from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, DateTime, Float, BigInteger
 from sqlalchemy.orm import relationship
 from database import Base
 import datetime
@@ -8,8 +8,8 @@ class User(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String)
     email = Column(String, unique=True, index=True)
-    identificacion = Column(Integer)
-    celular = Column(Integer)
+    identificacion = Column(BigInteger)
+    celular = Column(BigInteger)
     hashed_password = Column(String)
     is_active = Column(Boolean, default=True)
     is_admin =Column(Boolean, default=False)
