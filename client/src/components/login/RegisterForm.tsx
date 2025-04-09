@@ -1,7 +1,7 @@
 // src/components/RegisterForm.tsx
 import { useState } from "react";
 import axios from "axios";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import logo from "/Eventia.png";
 
@@ -13,6 +13,7 @@ const RegisterForm = () => {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -34,14 +35,16 @@ const RegisterForm = () => {
         userData
       );
   
-      // ✅ Si llega aquí, el registro fue exitoso
       Swal.fire({
         icon: "success",
         title: "Registro exitoso",
         text: "Ya puedes iniciar sesión",
         confirmButtonColor: "#facc15",
+      }).then((result) => {
+        if (result.isConfirmed || result.isDismissed) {
+          navigate('/login')
+        }
       });
-  
       // Redirigir o limpiar formulario si deseas
     } catch (error: any) {
       if (error.response?.status === 400 && error.response?.data.detail === "Email ya registrado") {
