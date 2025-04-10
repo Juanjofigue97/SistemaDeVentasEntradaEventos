@@ -31,6 +31,7 @@ class EventOut(BaseModel):
     capacity: int
     tickets_sold: int
     image : str
+    estado: str
 
     class Config:
         orm_mode = True
