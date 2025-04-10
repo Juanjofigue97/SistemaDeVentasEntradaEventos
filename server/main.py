@@ -19,7 +19,8 @@ templates = Jinja2Templates(directory="templates")
 origins = [
     "http://localhost:5173",  # Vite dev server
     "http://127.0.0.1:5173",
-    "https://eventia-venta-entradas.up.railway.app"
+    "https://eventia-venta-entradas.up.railway.app",
+    "https://server-production-f37c.up.railway.app"
 ]
 
 app.add_middleware(
