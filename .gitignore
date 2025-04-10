@@ -24,3 +24,5 @@ dist-ssr
 *.sw?
 .qodo
 *__pycache__
+
+.env

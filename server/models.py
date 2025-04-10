@@ -5,7 +5,7 @@ import datetime
 
 class User(Base):
     __tablename__ = 'users'
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String)
     email = Column(String, unique=True, index=True)
     identificacion = Column(Integer)
@@ -27,13 +27,14 @@ class Event(Base):
     price = Column(Float)
     capacity = Column(Integer)
     tickets_sold = Column(Integer, default=0)
+    image = Column(String)
+    estado = Column(String)
 
     entry_types = relationship("EntryType", back_populates="event", cascade="all, delete")
 
-
 class Ticket(Base):
     __tablename__ = 'tickets'
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
     user_id = Column(Integer, ForeignKey("users.id"))
     event_id = Column(Integer, ForeignKey("events.id"))
     entry_type_id = Column(Integer, ForeignKey("entry_types.id"))
