@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Comprar Entradas</title>
+    <script src="/static/js/tickets.js" defer></script>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="max-w-2xl mx-auto bg-white p-8 rounded shadow">
+        <h1 class="text-2xl font-bold mb-6 text-center">Compra tu entrada</h1>
+
+        <form id="ticketForm" class="space-y-4">
+            <!-- Tipo de entrada -->
+            <div>
+                <label for="entryType" class="block text-sm font-medium text-gray-700">Tipo de Entrada</label>
+                <select id="entryType" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+                    <!-- cargado dinámicamente -->
+                </select>
+            </div>
+
+            <div>
+                <label for="quantity" class="block text-sm font-medium text-gray-700">Cantidad</label>
+                <input type="number" id="quantity" min="1" value="1"
+                       class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+            </div>
+
+            <div>
+                <label for="discountCode" class="block text-sm font-medium text-gray-700">Código de Descuento</label>
+                <input type="text" id="discountCode"
+                       class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+            </div>
+
+            <button type="submit"
+                    class="w-full bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition">
+                Comprar Entrada
+            </button>
+        </form>
+
+        <div id="message" class="mt-6 text-center text-sm"></div>
+    </div>
+</body>
+</html>
