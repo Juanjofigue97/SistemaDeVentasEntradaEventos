@@ -1,9 +1,13 @@
 # admin.py
 
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends, UploadFile, File, Form
 from sqlalchemy.orm import Session
 from database import SessionLocal
 from typing import List
+from datetime import datetime
+import shutil
+import os
+
 import models, schemas
 
 
@@ -18,21 +22,86 @@ def get_db():
 
 # Crear evento
 @router.post("/eventos", response_model=schemas.EventOut)
-def crear_evento(event: schemas.EventOut, db: Session = Depends(get_db)):
-    nuevo_evento = models.Event(**event.dict())
-    db.add(nuevo_evento)
-    db.commit()
-    db.refresh(nuevo_evento)
-    return nuevo_evento
+
+async def crear_evento(
+    name: str = Form(...),
+    description: str = Form(...),
+    date: str = Form(...),
+    location: str = Form(...),
+    price: float = Form(...),
+    capacity: int = Form(...),
+    estado: str = Form(...),
+    image: UploadFile = File(...),
+    db: Session = Depends(get_db)
+):
+    try:
+        filename = f"img_{image.filename}"
+        image_path = os.path.join("static", "images", filename).replace("\\", "/")
+
+        # Guardar imagen
+        with open(image_path, "wb") as buffer:
+            shutil.copyfileobj(image.file, buffer)
+
+        # Crear evento en la base de datos
+        nuevo_evento = models.Event(
+            name=name,
+            description=description,
+            date=datetime.fromisoformat(date),
+            location=location,
+            price=price,
+            capacity=capacity,
+            image=image_path,  # Guardás la ruta relativa o absoluta
+            estado=estado
+        )
+
+        db.add(nuevo_evento)
+        db.commit()
+        db.refresh(nuevo_evento)
+
+        return nuevo_evento
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error al crear evento: {e}")
 
 # Actualizar evento
 @router.put("/eventos/{evento_id}", response_model=schemas.EventOut)
-def actualizar_evento(evento_id: int, evento_actualizado: schemas.EventOut, db: Session = Depends(get_db)):
-    evento = db.query(models.Event).get(evento_id)
+async def actualizar_evento(
+    evento_id: int,
+    name: str = Form(...),
+    description: str = Form(...),
+    date: str = Form(...),
+    location: str = Form(...),
+    price: float = Form(...),
+    capacity: int = Form(...),
+    estado: str = Form(...),
+    image: UploadFile = File(None),  # imagen opcional
+    db: Session = Depends(get_db)
+):
+    evento = db.query(models.Event).filter(models.Event.id == evento_id).first()
     if not evento:
         raise HTTPException(status_code=404, detail="Evento no encontrado")
-    for k, v in evento_actualizado.dict().items():
-        setattr(evento, k, v)
+
+    evento.name = name
+    evento.description = description
+    evento.date = datetime.fromisoformat(date)
+    evento.location = location
+    evento.price = price
+    evento.capacity = capacity
+    evento.estado = estado
+
+    if image:
+        # Guardar nueva imagen
+        filename = f"img_{image.filename}"
+        image_path = os.path.join("static", "images", filename).replace("\\", "/")
+
+        with open(image_path, "wb") as buffer:
+            shutil.copyfileobj(image.file, buffer)
+
+        # Opcional: eliminar la imagen anterior si existe
+        if evento.image and os.path.exists(evento.image):
+            os.remove(evento.image)
+
+        evento.image = image_path
+
     db.commit()
     db.refresh(evento)
     return evento
@@ -40,9 +109,14 @@ def actualizar_evento(evento_id: int, evento_actualizado: schemas.EventOut, db: 
 # Eliminar evento
 @router.delete("/eventos/{evento_id}")
 def eliminar_evento(evento_id: int, db: Session = Depends(get_db)):
-    evento = db.query(models.Event).get(evento_id)
+    evento = db.query(models.Event).filter(models.Event.id == evento_id).first()
     if not evento:
         raise HTTPException(status_code=404, detail="Evento no encontrado")
+    
+    # Eliminar la imagen si existe
+    if evento.image and os.path.exists(evento.image):
+        os.remove(evento.image)
+
     db.delete(evento)
     db.commit()
     return {"detail": "Evento eliminado"}
