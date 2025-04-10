@@ -26,3 +26,12 @@ dist-ssr
 *__pycache__
 
 .env
+
+# Python
+
+venv/
+env/
+.venv/
+.env/
+.env.*
+.env

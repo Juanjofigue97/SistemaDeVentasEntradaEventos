@@ -30,7 +30,7 @@ class EventOut(BaseModel):
     price: float
     capacity: int
     tickets_sold: int
-    image : str
+    image: str
     estado: str
 
     class Config:

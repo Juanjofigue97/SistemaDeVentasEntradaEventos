@@ -6,6 +6,7 @@ from models import Ticket, Event, Discount, User, EntryType
 from sqlalchemy.sql import func
 from schemas import TicketCreate, TicketOut
 from routers.auth import get_current_user
+from utils import send_email
 from typing import List
 import datetime
 
@@ -74,5 +75,5 @@ def buy_ticket(
     db.add(new_ticket)
     db.commit()
     db.refresh(new_ticket)
-
+    send_email(new_ticket, current_user.id)
     return new_ticket
