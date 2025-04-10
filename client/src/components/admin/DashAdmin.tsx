@@ -7,6 +7,7 @@ import {
   HiUsers,
   HiOutlineDotsVertical,
   HiX,
+  HiClipboardList,
 } from "react-icons/hi";
 import { Link, useNavigate } from "react-router-dom";
 import logo from "/EventiaDark.png";
@@ -15,6 +16,7 @@ import UserList from "./UserList";
 import EventList from "./EventList";
 import DiscountList from "./DiscountList";
 import TicketList from "./TicketList";
+import EntryTypeList from "./EntryTypeList"; // Asegúrate de que este archivo exista
 
 export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState("usuarios");
@@ -101,6 +103,18 @@ export default function AdminDashboard() {
                 <HiTicket className="mr-2" /> Entradas
               </button>
             </li>
+            <li>
+              <button
+                onClick={() => handleTabChange("tiposEntrada")}
+                className={`flex items-center w-full p-2 rounded ${
+                  activeTab === "tiposEntrada"
+                    ? "bg-yellow-500 text-gray-700"
+                    : "hover:bg-gray-600"
+                }`}
+              >
+                <HiClipboardList className="mr-2" /> Tipos de Entrada
+              </button>
+            </li>
           </ul>
         </nav>
 
@@ -132,6 +146,7 @@ export default function AdminDashboard() {
         {activeTab === "eventos" && <EventList />}
         {activeTab === "descuentos" && <DiscountList />}
         {activeTab === "entradas" && <TicketList />}
+        {activeTab === "tiposEntrada" && <EntryTypeList />}
       </main>
     </div>
   );

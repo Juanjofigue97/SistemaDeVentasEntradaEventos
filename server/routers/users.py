@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from database import SessionLocal
-from models import Ticket
-from schemas import TicketOut
+from models import Ticket, User
+from schemas import TicketOut, UserOut
 from utils import send_email
 from typing import List
 
@@ -14,6 +14,10 @@ def get_db():
         yield db
     finally:
         db.close()
+        
+@router.get("/", response_model=List[UserOut])
+def get_users(db: Session = Depends(get_db)):
+    return db.query(User).all()
 
 @router.get("/users/{user_id}/tickets", response_model=List[TicketOut])
 def user_tickets(user_id: int, db: Session = Depends(get_db)):

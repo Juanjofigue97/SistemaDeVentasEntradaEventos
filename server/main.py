@@ -7,6 +7,7 @@ from database import Base, engine
 import uvicorn
 from fastapi.middleware.cors import CORSMiddleware
 
+# Base.metadata.drop_all(bind=engine) 
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="Eventia - Sistema de Entradas")

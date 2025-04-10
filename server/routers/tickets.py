@@ -19,6 +19,11 @@ def get_db():
     finally:
         db.close()
 
+@router.get("/", response_model=List[TicketOut])
+def get_all_tickets(db: Session = Depends(get_db)):
+    tickets = db.query(Ticket).all()
+    return tickets
+
 @router.post("/", response_model=TicketOut)
 def buy_ticket(
     ticket: TicketCreate,

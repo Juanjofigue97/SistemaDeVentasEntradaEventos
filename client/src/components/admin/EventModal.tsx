@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Event } from "../../types/event";
-import { uploadImage, createEvent, updateEvent } from "../../services/eventService";
+import { createEvent, updateEvent } from "../../services/eventService";
 
 interface Props {
   type: "create" | "edit" | "detail";
@@ -24,6 +24,8 @@ export default function EventModal({ type, event, onClose }: Props) {
     estado: "activo",
   });
 
+  const [fileImage, setFileImage] = useState<File | null>(null);
+
   useEffect(() => {
     if (event) {
       setForm(event);
@@ -31,34 +33,53 @@ export default function EventModal({ type, event, onClose }: Props) {
   }, [event]);
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       const file = e.target.files[0];
-      try {
-        const uploadedImageUrl = await uploadImage(file);
-        setForm((prev) => ({ ...prev, image: uploadedImageUrl }));
-      } catch (error) {
-        console.error("Error subiendo imagen:", error);
-      }
+      setFileImage(file);
+
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        if (typeof reader.result === "string") {
+          setForm((prev) => ({ ...prev, image: reader.result as string }));
+        }
+      };
+      reader.readAsDataURL(file);
     }
   };
 
   const handleSubmit = async () => {
-    const dataToSend = { ...form, estado: "activo" };
+    const formData = new FormData();
 
-    if (type === "edit" && event) {
-      await updateEvent(event.id, dataToSend);
-    } else if (type === "create") {
-      await createEvent(dataToSend);
+    formData.append("name", form.name);
+    formData.append("description", form.description);
+    formData.append("date", form.date);
+    formData.append("location", form.location);
+    formData.append("price", String(form.price));
+    formData.append("capacity", String(form.capacity));
+    formData.append("estado", form.estado);
+
+    if (fileImage) {
+      formData.append("image", fileImage);
     }
 
-    onClose();
+    try {
+      if (type === "edit" && event) {
+        await updateEvent(event.id, formData);
+      } else if (type === "create") {
+        await createEvent(formData);
+      }
+
+      onClose();
+    } catch (error) {
+      console.error("Error en el envío del formulario:", error);
+    }
   };
 
   return (
@@ -88,6 +109,7 @@ export default function EventModal({ type, event, onClose }: Props) {
               className="w-full border border-gray-300 p-3 rounded-xl focus:ring-2 focus:ring-yellow-400"
             />
           </div>
+
           <div>
             <label className="block text-sm font-medium mb-1">Lugar</label>
             <input
@@ -98,6 +120,7 @@ export default function EventModal({ type, event, onClose }: Props) {
               className="w-full border border-gray-300 p-3 rounded-xl focus:ring-2 focus:ring-yellow-400"
             />
           </div>
+
           <div>
             <label className="block text-sm font-medium mb-1">Fecha</label>
             <input
@@ -109,6 +132,7 @@ export default function EventModal({ type, event, onClose }: Props) {
               className="w-full border border-gray-300 p-3 rounded-xl focus:ring-2 focus:ring-yellow-400"
             />
           </div>
+
           <div>
             <label className="block text-sm font-medium mb-1">Precio</label>
             <input
@@ -120,6 +144,7 @@ export default function EventModal({ type, event, onClose }: Props) {
               className="w-full border border-gray-300 p-3 rounded-xl focus:ring-2 focus:ring-yellow-400"
             />
           </div>
+
           <div>
             <label className="block text-sm font-medium mb-1">Capacidad</label>
             <input
@@ -131,18 +156,50 @@ export default function EventModal({ type, event, onClose }: Props) {
               className="w-full border border-gray-300 p-3 rounded-xl focus:ring-2 focus:ring-yellow-400"
             />
           </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-1">Estado</label>
+
+            {!isView ? (
+              <select
+                name="estado"
+                value={form.estado}
+                onChange={handleChange}
+                className="w-full border border-gray-300 p-3 rounded-xl focus:ring-2 focus:ring-yellow-400"
+              >
+                <option value="activo">Activo</option>
+                <option value="cancelado">Cancelado</option>
+                <option value="terminado">Terminado</option>
+              </select>
+            ) : (
+              <input
+                type="text"
+                value={form.estado}
+                disabled
+                className="w-full border border-gray-300 p-3 rounded-xl bg-gray-100"
+              />
+            )}
+          </div>
+
           <div>
             <label className="block text-sm font-medium mb-1">Imagen</label>
-            <input
-              type="file"
-              accept="image/*"
-              onChange={handleImageChange}
-              disabled={isView}
-              className="w-full p-2 border border-gray-300 rounded-xl file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:bg-yellow-500 file:text-white hover:file:bg-yellow-600"
-            />
-            {form.image && (type === "edit" || type === "detail") && (
+
+            {!isView && (
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleImageChange}
+                className="w-full p-2 border border-gray-300 rounded-xl file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:bg-yellow-500 file:text-white hover:file:bg-yellow-600"
+              />
+            )}
+
+            {form.image && (
               <img
-                src={form.image}
+                src={
+                  form.image.startsWith("http") || form.image.startsWith("data:")
+                    ? form.image
+                    : `${import.meta.env.VITE_API_URL}/${form.image}`
+                }
                 alt="Imagen del evento"
                 className="mt-2 w-full h-40 object-cover rounded-xl border"
               />

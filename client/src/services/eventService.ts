@@ -1,43 +1,60 @@
+// services/eventService.ts
+
 import { Event } from "../types/event";
 
-const API_URL = import.meta.env.VITE_API_URL + "/admin/eventos";
+const API_URL = import.meta.env.VITE_API_URL;
+const ADMIN_URL = `${API_URL}/admin/eventos`;
 
+// Obtener todos los eventos públicos (sin autenticación)
 export async function getEvents(): Promise<Event[]> {
-  const res = await fetch(import.meta.env.VITE_API_URL + "/events");
+  const res = await fetch(`${API_URL}/events`);
   if (!res.ok) throw new Error("Error al obtener eventos");
+  console.log(res);
   return res.json();
 }
 
-export async function createEvent(event: Event): Promise<Event> {
-  const res = await fetch(API_URL, {
+// Crear evento con FormData (incluye imagen)
+export async function createEvent(formData: FormData) {
+  const response = await fetch(`${API_URL}/admin/eventos`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(event),
+    body: formData,
   });
-  if (!res.ok) throw new Error("Error al crear evento");
-  return res.json();
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.detail || "Error creando el evento");
+  }
+
+  return await response.json();
 }
 
-export async function updateEvent(id: number, event: Event): Promise<Event> {
-  const res = await fetch(`${API_URL}/${id}`, {
+
+export const updateEvent = async (id: number, data: FormData) => {
+  const response = await fetch(`${API_URL}/admin/eventos/${id}`, {
     method: "PUT",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(event),
+    body: data,
   });
-  if (!res.ok) throw new Error("Error al actualizar evento");
-  return res.json();
-}
 
+  if (!response.ok) {
+    throw new Error("Error actualizando evento");
+  }
+
+  return await response.json();
+};
+
+// Eliminar evento
 export async function deleteEvent(id: number): Promise<void> {
-  const res = await fetch(`${API_URL}/${id}`, { method: "DELETE" });
+  const res = await fetch(`${ADMIN_URL}/${id}`, {
+    method: "DELETE",
+  });
   if (!res.ok) throw new Error("Error al eliminar evento");
 }
 
-export const uploadImage = async (file: File): Promise<string> => {
+export async function uploadImage(file: File): Promise<string> {
   const formData = new FormData();
   formData.append("file", file);
 
-  const response = await fetch(`${API_URL}/upload-image`, {
+  const response = await fetch(`${API_URL}/upload-image/`, {
     method: "POST",
     body: formData,
   });
@@ -47,5 +64,5 @@ export const uploadImage = async (file: File): Promise<string> => {
   }
 
   const data = await response.json();
-  return data.url; // esta será la URL completa que puedes guardar en tu evento
-};
+  return data.image_url; // asegúrate de que el backend devuelva este campo
+}

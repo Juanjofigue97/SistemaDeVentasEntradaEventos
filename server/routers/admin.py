@@ -133,6 +133,37 @@ def crear_tipo_entrada(entries: List[schemas.EntryTypeCreate], db: Session = Dep
     for tipo in nuevos_tipos:
         db.refresh(tipo)
     return nuevos_tipos
+# READ - todos o por evento
+@router.get("/entradas", response_model=List[schemas.EntryTypeOut])
+def listar_tipos_entrada(event_id: int = None, db: Session = Depends(get_db)):
+    if event_id:
+        return db.query(models.EntryType).filter(models.EntryType.event_id == event_id).all()
+    return db.query(models.EntryType).all()
+
+# UPDATE
+@router.put("/entradas/{entry_id}", response_model=schemas.EntryTypeOut)
+def actualizar_tipo_entrada(entry_id: int, data: schemas.EntryTypeCreate, db: Session = Depends(get_db)):
+    tipo_entrada = db.query(models.EntryType).get(entry_id)
+    if not tipo_entrada:
+        raise HTTPException(status_code=404, detail="Tipo de entrada no encontrado")
+
+    for key, value in data.dict().items():
+        setattr(tipo_entrada, key, value)
+
+    db.commit()
+    db.refresh(tipo_entrada)
+    return tipo_entrada
+
+# DELETE
+@router.delete("/entradas/{entry_id}", response_model=schemas.EntryTypeOut)
+def eliminar_tipo_entrada(entry_id: int, db: Session = Depends(get_db)):
+    tipo_entrada = db.query(models.EntryType).get(entry_id)
+    if not tipo_entrada:
+        raise HTTPException(status_code=404, detail="Tipo de entrada no encontrado")
+
+    db.delete(tipo_entrada)
+    db.commit()
+    return tipo_entrada
 
 # Crear código de descuento
 @router.post("/descuentos", response_model=schemas.Discount)
@@ -145,3 +176,43 @@ def crear_descuento(descuento: schemas.Discount, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(nuevo_descuento)
     return nuevo_descuento
+
+# Listar todos los descuentos
+@router.get("/descuentos", response_model=list[schemas.Discount])
+def listar_descuentos(db: Session = Depends(get_db)):
+    return db.query(models.Discount).all()
+
+# Obtener un descuento por ID
+@router.get("/descuentos/{descuento_id}", response_model=schemas.Discount)
+def obtener_descuento(descuento_id: int, db: Session = Depends(get_db)):
+    descuento = db.query(models.Discount).filter_by(id=descuento_id).first()
+    if not descuento:
+        raise HTTPException(status_code=404, detail="Descuento no encontrado.")
+    return descuento
+
+# Actualizar un descuento
+@router.put("/descuentos/{descuento_id}", response_model=schemas.Discount)
+def actualizar_descuento(descuento_id: int, datos: schemas.Discount, db: Session = Depends(get_db)):
+    descuento = db.query(models.Discount).filter_by(id=descuento_id).first()
+    if not descuento:
+        raise HTTPException(status_code=404, detail="Descuento no encontrado.")
+    
+    descuento.code = datos.code
+    descuento.percentage = datos.percentage
+    descuento.is_active = datos.is_active
+
+    db.commit()
+    db.refresh(descuento)
+    return descuento
+
+# Eliminar un descuento (borrado lógico)
+@router.delete("/descuentos/{descuento_id}", response_model=schemas.Discount)
+def eliminar_descuento(descuento_id: int, db: Session = Depends(get_db)):
+    descuento = db.query(models.Discount).filter_by(id=descuento_id).first()
+    if not descuento:
+        raise HTTPException(status_code=404, detail="Descuento no encontrado.")
+
+    descuento.is_active = False  # borrado lógico
+    db.commit()
+    db.refresh(descuento)
+    return descuento

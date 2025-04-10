@@ -19,7 +19,7 @@ class User(Base):
 
 class Event(Base):
     __tablename__ = 'events'
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String)
     description = Column(String)
     date = Column(DateTime)
@@ -49,7 +49,8 @@ class Ticket(Base):
 
 class Discount(Base):
     __tablename__ = 'discounts'
-    code = Column(String, primary_key=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    code = Column(String, unique=True, index=True)  # ✅ Código único
     percentage = Column(Float)
     is_active = Column(Boolean, default=True)
 
