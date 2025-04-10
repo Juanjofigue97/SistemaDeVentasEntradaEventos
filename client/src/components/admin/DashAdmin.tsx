@@ -1,7 +1,6 @@
 import { useState } from "react";
 import {
   HiCalendar,
-  HiUser,
   HiTicket,
   HiCash,
   HiUsers,
@@ -21,7 +20,7 @@ import EntryTypeList from "./EntryTypeList"; // Asegúrate de que este archivo e
 export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState("usuarios");
   const [menuOpen, setMenuOpen] = useState(false);
-  const { user } = useAuth();
+  const { } = useAuth();
   const navigate = useNavigate();
 
   const handleTabChange = (tab: string) => {

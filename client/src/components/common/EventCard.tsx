@@ -1,16 +1,6 @@
 import { FaMapMarkerAlt } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-
-type EventCardProps = {
-  id: number;
-  title: string;
-  date: string;
-  time: string;
-  location: string;
-  image: string;
-  category: string;
-  available: boolean;
-};
+import { Event } from "../../types/event";
 
 const formatDate = (dateString: string) => {
   const date = new Date(dateString);
@@ -20,28 +10,23 @@ const formatDate = (dateString: string) => {
   return { day, month, year };
 };
 
-const formatTime = (time: string) => {
-  const [hour, minute] = time.split(":");
-  return { hour, minute };
-};
-
 const EventCard = ({
   id,
-  title,
+  name,
   date,
-  time,
   location,
   image,
-  available,
-}: EventCardProps) => {
+  estado,
+}: Event) => {
   const navigate = useNavigate();
   const { day, month, year } = formatDate(date);
-  const { hour, minute } = formatTime(time);
+
+  const available = estado === "disponible"; // ajusta según tu lógica de estado
 
   const handleCardClick = () => {
     if (available) {
       navigate(`/comprar-entrada/${id}`, {
-        state: { event: { id, title, date, time, location, image } },
+        state: { event: { id, name, date, location, image } },
       });
     }
   };
@@ -50,13 +35,12 @@ const EventCard = ({
     <div
       onClick={handleCardClick}
       className={`relative bg-white rounded-2xl overflow-hidden shadow-md transition duration-300 hover:-translate-y-1 dark:bg-gray-800 w-full max-w-[280px] mx-auto flex flex-col ${
-        available 
-          ? "hover:shadow-xl cursor-pointer hover:border-2 hover:border-yellow-500" 
+        available
+          ? "hover:shadow-xl cursor-pointer hover:border-2 hover:border-yellow-500"
           : "opacity-80 cursor-not-allowed"
       }`}
       style={{ height: "100%" }}
     >
-      {/* Sold Out etiqueta roja */}
       {!available && (
         <div className="absolute top-0 left-0 bg-red-600 text-white text-xs font-bold px-3 py-1 z-10 rounded-br-lg shadow-md">
           SOLD OUT
@@ -65,12 +49,11 @@ const EventCard = ({
 
       <img
         src={image}
-        alt={title}
+        alt={name}
         className="w-full h-56 object-cover rounded-t-2xl"
       />
 
       <div className="flex flex-col justify-between flex-grow p-4">
-        {/* Info superior */}
         <div>
           <p className="flex items-center text-sm text-gray-500 dark:text-gray-400 mb-1">
             <FaMapMarkerAlt />
@@ -78,23 +61,15 @@ const EventCard = ({
           </p>
 
           <h3 className="text-lg font-semibold text-gray-800 dark:text-white line-clamp-2">
-            {title}
+            {name}
           </h3>
         </div>
 
-        {/* Fecha y hora */}
         <div className="flex justify-center items-center gap-6 text-center text-gray-800 dark:text-gray-100 mt-4">
           <div>
             <p className="text-2xl font-bold">{day}</p>
             <p className="text-sm uppercase">{month}</p>
             <p className="text-xs">{year}</p>
-          </div>
-
-          <div className="w-px h-10 bg-gray-300" />
-
-          <div>
-            <p className="text-2xl font-bold">{hour}</p>
-            <p className="text-sm">{minute} hrs</p>
           </div>
         </div>
       </div>
