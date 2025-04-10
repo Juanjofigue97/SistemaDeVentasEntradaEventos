@@ -25,6 +25,8 @@ dist-ssr
 .qodo
 *__pycache__
 
+.env
+
 # Python
 
 venv/
