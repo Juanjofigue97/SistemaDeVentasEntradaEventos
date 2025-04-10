@@ -1,8 +1,10 @@
 from fastapi import FastAPI
-from routers import auth, events, tickets, users, admin
+from routers import auth, events, tickets, users, admin, upload
 from database import Base, engine
 import uvicorn
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+
 
 Base.metadata.create_all(bind=engine)
 
@@ -22,11 +24,14 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.mount("/static", StaticFiles(directory="static"), name="static")
+app.include_router(upload.router)
 app.include_router(auth.router)
 app.include_router(events.router)
 app.include_router(tickets.router)
 app.include_router(users.router)
 app.include_router(admin.router)
+
 
 if __name__ == "__main__":
     uvicorn.run(app, host='localhost', port=8013)

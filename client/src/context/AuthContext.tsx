@@ -35,7 +35,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const login = (token: string, email: string) => {
     try {
       const decoded: any = jwtDecode(token);
+      console.log(decoded.is_admin);
+      console.log(decoded.email);
+      console.log(decoded.token);
       const role: Role = decoded.is_admin ? "admin" : "user";
+      console.log(role);
       const userData: User = {
         email,
         role,

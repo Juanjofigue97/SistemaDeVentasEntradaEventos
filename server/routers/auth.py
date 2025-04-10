@@ -67,7 +67,17 @@ def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depend
     if not user or not verify_password(form_data.password, user.hashed_password):
         raise HTTPException(status_code=401, detail="Credenciales inválidas")
     
-    access_token = create_access_token(data={"sub": str(user.id)})
+    access_token = create_access_token(data={
+        "sub": str(user.id),
+        "id": user.id,
+        "name": user.name,
+        "email": user.email,
+        "identificacion": user.identificacion,
+        "celular": user.celular,
+        "is_active": user.is_active,
+        "is_admin": user.is_admin
+    })
+    
     return {"access_token": access_token, "token_type": "bearer"}
 
 # Dependencia para obtener usuario autenticado

@@ -1,11 +1,12 @@
 export interface Event {
-    id: number;
-    title: string;
-    date: string;
-    time: string;
-    location: string;
-    image: string;
-    category: string;
-    available: boolean;
-  }
-  
+  id: number;
+  name: string;
+  description: string;
+  date: string;
+  location: string;
+  price: number;
+  capacity: number;
+  tickets_sold: number;
+  image: string;
+  estado: string;
+}
