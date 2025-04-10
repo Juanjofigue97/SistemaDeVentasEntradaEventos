@@ -22,6 +22,7 @@ document.getElementById("loginForm").addEventListener("submit", async function (
         } else {
             const data = await response.json();
             localStorage.setItem("access_token", data.access_token);
+            localStorage.setItem("user_id", data.user_id);
             alert("Inicio de sesión exitoso.");
             // Redirige a tu dashboard o página principal
             if (data.is_admin) {
