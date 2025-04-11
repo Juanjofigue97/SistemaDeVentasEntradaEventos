@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { EntryType } from "../../types/entryType";
 import { buyTicket, getEntryTypesByEvent, validateDiscount } from "../../services/ticketService";
-import { TicketCreate } from "../../types/ticket";
 import Swal from "sweetalert2";
 
 interface Props {
@@ -105,7 +104,7 @@ const FormularioCompra = ({ eventId }: Props) => {
     if (!selectedTypeId) {
       Swal.fire({
         icon: "warning",
-        title: "Campo obligatorio",
+        title: "Tipo de entrada no seleccionado",
         text: "Debes seleccionar un tipo de entrada.",
       });
       return;
@@ -113,29 +112,32 @@ const FormularioCompra = ({ eventId }: Props) => {
   
     setLoading(true);
     try {
-      const ticket: TicketCreate = {
+      const ticket: any = {
         event_id: eventId,
         entry_type_id: selectedTypeId,
         quantity,
-        discount_code: discountCode.trim() || undefined,
       };
   
-      await buyTicket(ticket);
+      if (discountCode.trim()) {
+        ticket.discount_code = discountCode.trim();
+      }else{
+        ticket.discount_code = ""
+      }
+      
+      const result = await buyTicket(ticket);
   
       Swal.fire({
         icon: "success",
-        title: "Compra realizada con éxito",
-        html: discountApplied
-          ? `Se aplicó un <strong>${discountCode.toUpperCase()}</strong> con <strong>${((price! - finalPrice!) / price! * 100).toFixed(0)}%</strong> de descuento.`
-          : "Gracias por tu compra.",
-      }).then(() => {
-        navigate("/dashboard");
+        title: "Compra exitosa",
+        text: `Compra realizada con éxito. Total pagado: $${result.total_price}`,
       });
-    } catch (error) {
+  
+      navigate("/dashboard");
+    } catch (error: any) {
       Swal.fire({
         icon: "error",
-        title: "Error",
-        text: "Error al procesar la compra.",
+        title: "Error al procesar la compra",
+        text: error?.response?.data?.detail || "Ocurrió un error inesperado.",
       });
     } finally {
       setLoading(false);

@@ -9,7 +9,6 @@ const ADMIN_URL = `${API_URL}/admin/eventos`;
 export async function getEvents(): Promise<Event[]> {
   const res = await fetch(`${API_URL}/events`);
   if (!res.ok) throw new Error("Error al obtener eventos");
-  console.log(res);
   return res.json();
 }
 

@@ -1,14 +1,23 @@
+import { useEffect, useState } from "react";
+import TicketHistoryList from "./TicketHistoryList";
+
 const Historial = () => {
-    return (
-      <div className="max-w-2xl border border-yellow-500 rounded-lg p-6">
-        <h3 className="font-bold text-gray-700 mb-4">Historial de Compras</h3>
-        <ul className="space-y-2 text-sm text-gray-800">
-          <li>🎟️ Entrada - Concierto de Rock - 05/04/2025</li>
-          <li>🎟️ Entrada - Festival de Jazz - 21/03/2025</li>
-        </ul>
-      </div>
-    );
-  };
-  
-  export default Historial;
-  
+  const [userId, setUserId] = useState<number | null>(null);
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      const parsedUser = JSON.parse(storedUser);
+      setUserId(parsedUser.id);
+    }
+  }, []);
+
+  return (
+    <div className="max-w-3xl mx-auto mt-6">
+      <h2 className="text-2xl font-bold text-gray-700 mb-4">🎟️ Historial de Compras</h2>
+      {userId && <TicketHistoryList userId={userId} />}
+    </div>
+  );
+};
+
+export default Historial;

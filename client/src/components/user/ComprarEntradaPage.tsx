@@ -14,7 +14,7 @@ type LocationState = {
 };
 
 const ComprarEntradaPage = () => {
-    const { id } = useParams();
+    const { } = useParams();
     const location = useLocation();
     const state = location.state as LocationState;
 

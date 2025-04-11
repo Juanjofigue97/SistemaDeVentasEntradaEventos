@@ -11,7 +11,7 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-white">
-      {user.role === "admin" ? <DashAdmin /> : <Dashboard />}
+      {user.is_admin === true ? <DashAdmin /> : <Dashboard />}
     </div>
   );
 }

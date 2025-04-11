@@ -1,12 +1,12 @@
 import { Link, Outlet, useLocation } from "react-router-dom";
-import { HiCalendar, HiUser, HiTicket, HiShoppingBag, HiOutlineDotsVertical, HiX } from "react-icons/hi";
+import { HiCalendar, HiUser, HiShoppingBag, HiOutlineDotsVertical, HiX } from "react-icons/hi";
 import logo from "/EventiaDark.png";
 import { useState } from "react";
 import { useAuth } from "../../context/AuthContext";
 
 export default function Dashboard() {
   const [menuOpen, setMenuOpen] = useState(false);
-  const { user } = useAuth();
+  const { } = useAuth();
   const location = useLocation();
 
   const getTabName = () => {
@@ -39,11 +39,6 @@ export default function Dashboard() {
             <li>
               <Link to="/dashboard/eventos" className={`flex items-center w-full p-2 rounded ${location.pathname.includes("eventos") ? "bg-yellow-500 text-gray-700" : "hover:bg-gray-600"}`}>
                 <HiCalendar className="mr-2" /> Eventos
-              </Link>
-            </li>
-            <li>
-              <Link to="/dashboard/compras" className={`flex items-center w-full p-2 rounded ${location.pathname.includes("compras") ? "bg-yellow-500 text-gray-700" : "hover:bg-gray-600"}`}>
-                <HiTicket className="mr-2" /> Comprar entradas
               </Link>
             </li>
             <li>

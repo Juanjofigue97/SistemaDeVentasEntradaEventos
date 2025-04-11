@@ -172,7 +172,7 @@ def eliminar_tipo_entrada(entry_id: int, db: Session = Depends(get_db)):
 
 # Crear código de descuento
 @router.post("/descuentos", response_model=schemas.Discount)
-def crear_descuento(descuento: schemas.Discount, db: Session = Depends(get_db)):
+def crear_descuento(descuento: schemas.DiscountCreate, db: Session = Depends(get_db)):
     existente = db.query(models.Discount).filter_by(code=descuento.code).first()
     if existente:
         raise HTTPException(status_code=400, detail="El código de descuento ya existe.")
@@ -181,6 +181,7 @@ def crear_descuento(descuento: schemas.Discount, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(nuevo_descuento)
     return nuevo_descuento
+
 
 # Listar todos los descuentos
 @router.get("/descuentos", response_model=list[schemas.Discount])

@@ -1,5 +1,5 @@
 import axios from "axios";
-import { Discount } from "../types/discount";
+import { Discount, DiscountCreate } from "../types/discount";
 
 const API_URL = import.meta.env.VITE_API_URL;
 const ADMIN_URL = `${API_URL}/admin`;
@@ -8,7 +8,7 @@ export const getAllDiscounts = async () => {
   return response.data;
 };
 
-export const createDiscount = async (discount: Discount) => {
+export const createDiscount = async (discount: DiscountCreate): Promise<Discount> => {
   const response = await axios.post<Discount>(`${ADMIN_URL}/descuentos`, discount);
   return response.data;
 };

@@ -1,14 +1,8 @@
 // src/context/AuthContext.tsx
 import { createContext, useContext, useEffect, useState } from "react";
 import {jwtDecode} from "jwt-decode";
+import { User } from "../types/userType";
 
-type Role = "admin" | "user";
-
-interface User {
-  email: string;
-  role: Role;
-  token: string;
-}
 
 interface AuthContextType {
   user: User | null;
@@ -32,20 +26,20 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     setIsLoading(false);
   }, []);
 
-  const login = (token: string, email: string) => {
+  const login = (token: string) => {
     try {
       const decoded: any = jwtDecode(token);
-      console.log(decoded.is_admin);
-      console.log(decoded.email);
-      console.log(decoded.token);
-      const role: Role = decoded.is_admin ? "admin" : "user";
-      console.log(role);
+      console.log("Decoded JWT:", decoded);
+  
       const userData: User = {
-        email,
-        role,
+        id: decoded.id,
+        name: decoded.name,
+        email: decoded.email,
+        identificacion: decoded.identificacion,
+        celular: decoded.celular,
+        is_admin: decoded.is_admin,
         token,
       };
-
       setUser(userData);
       localStorage.setItem("user", JSON.stringify(userData));
     } catch (error) {

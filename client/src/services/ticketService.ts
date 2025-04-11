@@ -14,6 +14,7 @@ export const getAllTickets = async (): Promise<Ticket[]> => {
 
 export const buyTicket = async (ticket: TicketCreate): Promise<Ticket> => {
   const token = localStorage.getItem("token");
+  console.log("Ticket a enviar:", ticket);
   const response = await axios.post(`${API_URL}/tickets`, ticket, {
     headers: {
       "Content-Type": "application/json",
@@ -60,4 +61,29 @@ export const validateDiscount = async ({
 export const getEntryTypesByEvent = async (eventId: number) => {
   const response = await axios.get(`${API_URL}/admin/entradas?event_id=${eventId}`);
   return response.data;
+};
+
+export interface TicketHistory {
+  name_evento: string;
+  date: string;
+  locacion: string;
+  entradas: number;
+  tipo_entrada: string;
+  total: number;
+}
+
+export const getUserTickets = async (userId: number): Promise<TicketHistory[]> => {
+  const token = localStorage.getItem("access_token");
+
+  const res = await fetch(`${API_URL}/user/${userId}/tickets`, {
+    headers: {
+      "Authorization": `Bearer ${token}`,
+    },
+  });
+  console.log(res);
+  if (!res.ok) {
+    throw new Error("Error al obtener el historial de tickets");
+  }
+
+  return await res.json();
 };
