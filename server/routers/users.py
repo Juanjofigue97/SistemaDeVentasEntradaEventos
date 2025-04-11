@@ -1,8 +1,10 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from database import SessionLocal
-from models import Ticket, Event
+from models import EntryType, Ticket, Event
 from schemas import TicketOut
+from models import Ticket, User
+from schemas import TicketOut, UserOut
 from utils import send_email
 from typing import List
 
@@ -14,6 +16,10 @@ def get_db():
         yield db
     finally:
         db.close()
+        
+@router.get("/", response_model=List[UserOut])
+def get_users(db: Session = Depends(get_db)):
+    return db.query(User).all()
 
 @router.get("/{user_id}/tickets")
 def user_tickets(user_id: int, db: Session = Depends(get_db)):
@@ -22,13 +28,18 @@ def user_tickets(user_id: int, db: Session = Depends(get_db)):
     historial = []
     for ticket in tickets:
         evento = db.query(Event).filter(Event.id == ticket.event_id).first()
+        entry_type = db.query(EntryType).filter(
+            EntryType.id == ticket.entry_type.id,
+            EntryType.event_id == ticket.event_id
+        ).first()
         data = {
             "name_evento": evento.name,
             "date": evento.date,
             "locacion": evento.location,
             "entradas": ticket.quantity,
-            "tipo_entradas": ticket.entry_type,
-            "total": ticket.total_price
+            "tipo_entrada": entry_type.name,
+            "total": ticket.total_price,
+            "estado": evento.estado
         }
         historial.append(data)
     return historial

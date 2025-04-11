@@ -44,7 +44,9 @@ class TicketCreate(BaseModel):
 
 class TicketOut(BaseModel):
     id: int
+    user_id: int
     event_id: int
+    entry_type_id: int
     quantity: int
     total_price: float
     purchase_date: datetime
@@ -70,9 +72,24 @@ class EntryTypeOut(BaseModel):
         orm_mode = True
 
 class Discount(BaseModel):
+    id: int
     code: str
     percentage: float
     is_active: bool
     
+    class Config:
+        orm_mode = True
+        
+class DiscountCreate(BaseModel):
+    code: str
+    percentage: float
+    is_active: bool = True
+
+class DiscountOut(BaseModel):
+    id: int
+    code: str
+    percentage: float
+    is_active: bool
+
     class Config:
         orm_mode = True

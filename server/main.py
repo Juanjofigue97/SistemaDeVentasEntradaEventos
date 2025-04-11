@@ -2,11 +2,12 @@ from fastapi import FastAPI, Request
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse
-from routers import auth, events, tickets, users, admin
+from routers import auth, events, tickets, users, admin, upload
 from database import Base, engine
 import uvicorn
 from fastapi.middleware.cors import CORSMiddleware
 
+# Base.metadata.drop_all(bind=engine) 
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="Eventia - Sistema de Entradas")
@@ -18,17 +19,20 @@ templates = Jinja2Templates(directory="templates")
 origins = [
     "http://localhost:5173",  # Vite dev server
     "http://127.0.0.1:5173",
-    "https://eventia-venta-entradas.up.railway.app"
+    "https://eventia-venta-entradas.up.railway.app",
+    "https://server-production-f37c.up.railway.app"
 ]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,  # También puedes usar ["*"] para permitir todos
+    allow_origins=["*"],  # También puedes usar ["*"] para permitir todos
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
+app.mount("/static", StaticFiles(directory="static"), name="static")
+app.include_router(upload.router)
 app.include_router(auth.router)
 app.include_router(events.router)
 app.include_router(tickets.router)

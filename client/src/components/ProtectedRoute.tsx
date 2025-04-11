@@ -1,12 +1,12 @@
-// src/components/ProtectedRoute.tsx
 import { Navigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+
 interface Props {
   children: React.ReactNode;
-  requiredRole?: "admin" | "user";
+  requiredAdmin?: boolean;
 }
 
-export default function ProtectedRoute({ children, requiredRole }: Props) {
+export default function ProtectedRoute({ children, requiredAdmin = false }: Props) {
   const { user, isLoading } = useAuth();
 
   if (isLoading) {
@@ -16,16 +16,15 @@ export default function ProtectedRoute({ children, requiredRole }: Props) {
   if (!user) {
     const wasLogout = localStorage.getItem("logout") === "true";
     if (wasLogout) {
-      localStorage.removeItem("logout"); // 👈 limpiamos para no afectar después
+      localStorage.removeItem("logout");
       return <Navigate to="/" replace />;
     }
     return <Navigate to="/auth-required" replace />;
   }
 
-  if (requiredRole && user.role !== requiredRole) {
+  if (requiredAdmin && !user.is_admin) {
     return <Navigate to="/unauthorized" replace />;
   }
 
   return <>{children}</>;
 }
-

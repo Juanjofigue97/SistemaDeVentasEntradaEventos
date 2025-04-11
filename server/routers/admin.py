@@ -1,4 +1,8 @@
 # admin.py
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
 
 from fastapi import APIRouter, HTTPException, Depends, UploadFile, File, Form
 from sqlalchemy.orm import Session
@@ -9,7 +13,16 @@ import shutil
 import os
 
 import models, schemas
+import cloudinary
+import cloudinary.uploader
+from cloudinary.utils import cloudinary_url
 
+cloudinary.config(
+    cloud_name=os.getenv("CLOUDINARY_CLOUD_NAME"),
+    api_key=os.getenv("CLOUDINARY_API_KEY"),
+    api_secret=os.getenv("CLOUDINARY_API_SECRET"),
+    secure=True
+)
 
 router = APIRouter(prefix="/admin", tags=["Admin"])
 
@@ -22,7 +35,6 @@ def get_db():
 
 # Crear evento
 @router.post("/eventos", response_model=schemas.EventOut)
-
 async def crear_evento(
     name: str = Form(...),
     description: str = Form(...),
@@ -35,14 +47,10 @@ async def crear_evento(
     db: Session = Depends(get_db)
 ):
     try:
-        filename = f"img_{image.filename}"
-        image_path = os.path.join("static", "images", filename).replace("\\", "/")
+        # Subir imagen a Cloudinary
+        cloudinary_response = cloudinary.uploader.upload(image.file)
+        image_url = cloudinary_response.get("secure_url")
 
-        # Guardar imagen
-        with open(image_path, "wb") as buffer:
-            shutil.copyfileobj(image.file, buffer)
-
-        # Crear evento en la base de datos
         nuevo_evento = models.Event(
             name=name,
             description=description,
@@ -50,7 +58,7 @@ async def crear_evento(
             location=location,
             price=price,
             capacity=capacity,
-            image=image_path,  # Guardás la ruta relativa o absoluta
+            image=image_url,  # Guardamos la URL
             estado=estado
         )
 
@@ -59,6 +67,7 @@ async def crear_evento(
         db.refresh(nuevo_evento)
 
         return nuevo_evento
+
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error al crear evento: {e}")
 
@@ -89,18 +98,14 @@ async def actualizar_evento(
     evento.estado = estado
 
     if image:
-        # Guardar nueva imagen
-        filename = f"img_{image.filename}"
-        image_path = os.path.join("static", "images", filename).replace("\\", "/")
+        # Subir nueva imagen a Cloudinary
+        result = cloudinary.uploader.upload(image.file, folder="eventia/images")
+        image_url = result.get("secure_url")
 
-        with open(image_path, "wb") as buffer:
-            shutil.copyfileobj(image.file, buffer)
+        # Eliminar imagen anterior si deseas (opcional y si guardabas URL anterior)
+        # Cloudinary no elimina automáticamente a menos que lo hagas manual
 
-        # Opcional: eliminar la imagen anterior si existe
-        if evento.image and os.path.exists(evento.image):
-            os.remove(evento.image)
-
-        evento.image = image_path
+        evento.image = image_url
 
     db.commit()
     db.refresh(evento)
@@ -133,10 +138,41 @@ def crear_tipo_entrada(entries: List[schemas.EntryTypeCreate], db: Session = Dep
     for tipo in nuevos_tipos:
         db.refresh(tipo)
     return nuevos_tipos
+# READ - todos o por evento
+@router.get("/entradas", response_model=List[schemas.EntryTypeOut])
+def listar_tipos_entrada(event_id: int = None, db: Session = Depends(get_db)):
+    if event_id:
+        return db.query(models.EntryType).filter(models.EntryType.event_id == event_id).all()
+    return db.query(models.EntryType).all()
+
+# UPDATE
+@router.put("/entradas/{entry_id}", response_model=schemas.EntryTypeOut)
+def actualizar_tipo_entrada(entry_id: int, data: schemas.EntryTypeCreate, db: Session = Depends(get_db)):
+    tipo_entrada = db.query(models.EntryType).get(entry_id)
+    if not tipo_entrada:
+        raise HTTPException(status_code=404, detail="Tipo de entrada no encontrado")
+
+    for key, value in data.dict().items():
+        setattr(tipo_entrada, key, value)
+
+    db.commit()
+    db.refresh(tipo_entrada)
+    return tipo_entrada
+
+# DELETE
+@router.delete("/entradas/{entry_id}", response_model=schemas.EntryTypeOut)
+def eliminar_tipo_entrada(entry_id: int, db: Session = Depends(get_db)):
+    tipo_entrada = db.query(models.EntryType).get(entry_id)
+    if not tipo_entrada:
+        raise HTTPException(status_code=404, detail="Tipo de entrada no encontrado")
+
+    db.delete(tipo_entrada)
+    db.commit()
+    return tipo_entrada
 
 # Crear código de descuento
 @router.post("/descuentos", response_model=schemas.Discount)
-def crear_descuento(descuento: schemas.Discount, db: Session = Depends(get_db)):
+def crear_descuento(descuento: schemas.DiscountCreate, db: Session = Depends(get_db)):
     existente = db.query(models.Discount).filter_by(code=descuento.code).first()
     if existente:
         raise HTTPException(status_code=400, detail="El código de descuento ya existe.")
@@ -145,3 +181,44 @@ def crear_descuento(descuento: schemas.Discount, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(nuevo_descuento)
     return nuevo_descuento
+
+
+# Listar todos los descuentos
+@router.get("/descuentos", response_model=list[schemas.Discount])
+def listar_descuentos(db: Session = Depends(get_db)):
+    return db.query(models.Discount).all()
+
+# Obtener un descuento por ID
+@router.get("/descuentos/{descuento_id}", response_model=schemas.Discount)
+def obtener_descuento(descuento_id: int, db: Session = Depends(get_db)):
+    descuento = db.query(models.Discount).filter_by(id=descuento_id).first()
+    if not descuento:
+        raise HTTPException(status_code=404, detail="Descuento no encontrado.")
+    return descuento
+
+# Actualizar un descuento
+@router.put("/descuentos/{descuento_id}", response_model=schemas.Discount)
+def actualizar_descuento(descuento_id: int, datos: schemas.Discount, db: Session = Depends(get_db)):
+    descuento = db.query(models.Discount).filter_by(id=descuento_id).first()
+    if not descuento:
+        raise HTTPException(status_code=404, detail="Descuento no encontrado.")
+    
+    descuento.code = datos.code
+    descuento.percentage = datos.percentage
+    descuento.is_active = datos.is_active
+
+    db.commit()
+    db.refresh(descuento)
+    return descuento
+
+# Eliminar un descuento (borrado lógico)
+@router.delete("/descuentos/{descuento_id}", response_model=schemas.Discount)
+def eliminar_descuento(descuento_id: int, db: Session = Depends(get_db)):
+    descuento = db.query(models.Discount).filter_by(id=descuento_id).first()
+    if not descuento:
+        raise HTTPException(status_code=404, detail="Descuento no encontrado.")
+
+    descuento.is_active = False  # borrado lógico
+    db.commit()
+    db.refresh(descuento)
+    return descuento
