@@ -7,7 +7,9 @@ const ADMIN_URL = `${API_URL}/admin/eventos`;
 
 // Obtener todos los eventos públicos (sin autenticación)
 export async function getEvents(): Promise<Event[]> {
-  const res = await fetch(`${API_URL}/events`);
+  const res = await fetch(`${API_URL}/events`, {
+    credentials: 'include', // ✅ esto es clave
+  });
   if (!res.ok) throw new Error("Error al obtener eventos");
   return res.json();
 }
