@@ -15,7 +15,7 @@ export const getAllTickets = async (): Promise<Ticket[]> => {
 export const buyTicket = async (ticket: TicketCreate): Promise<Ticket> => {
   const token = localStorage.getItem("token");
   console.log("Ticket a enviar:", ticket);
-  const response = await axios.post(`${API_URL}/tickets`, ticket, {
+  const response = await axios.post("https://server-production-f37c.up.railway.app/tickets/", ticket, {
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
