@@ -75,5 +75,5 @@ def buy_ticket(
     db.add(new_ticket)
     db.commit()
     db.refresh(new_ticket)
-    send_email(new_ticket, current_user.id)
+    send_email(TicketOut.from_orm(new_ticket), current_user.id)
     return new_ticket
