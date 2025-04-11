@@ -80,7 +80,7 @@ def buy_ticket(
     db.add(new_ticket)
     db.commit()
     db.refresh(new_ticket)
-    send_email(TicketOut.from_orm(new_ticket), current_user.id)
+    result = send_email(TicketOut.from_orm(new_ticket), current_user.id)
     return new_ticket
 
 @router.get("/validate-discount")
