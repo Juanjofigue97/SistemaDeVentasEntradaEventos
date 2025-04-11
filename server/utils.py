@@ -3,16 +3,17 @@ import qrcode
 import uuid
 from database import SessionLocal
 from models import Event, User
+from schemas import TicketOut
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email.mime.image import MIMEImage
 from io import BytesIO
 
-def send_email(ticket, user_id):
+def send_email(ticket: TicketOut, user_id):
     db = SessionLocal()
     try:
         # Verificar que el evento exista
-        event = db.query(Event).filter(Event.id == ticket['event_id']).first()
+        event = db.query(Event).filter(Event.id == ticket.event_id).first()
         user = db.query(User).filter(User.id == user_id).first()
         
         if not event or not user:
@@ -27,9 +28,9 @@ def send_email(ticket, user_id):
         Detalles del ticket
         - Evento: {event.name}
         - Fecha del evento: {event.date}
-        - Cantidad de entradas: {ticket['quantity']}
-        - Precio total: ${ticket['total_price']}
-        - Fecha de compra: {ticket['purchase_date']}
+        - Cantidad de entradas: {ticket.quantity}
+        - Precio total: ${ticket.total_price}
+        - Fecha de compra: {ticket.purchase_date}
 
         Adjuntamos tus entradas con códigos QR únicos para cada una. Preséntalos el día del evento.
 
@@ -41,7 +42,7 @@ def send_email(ticket, user_id):
         message['Subject'] = subject
         message.attach(MIMEText(body, 'plain'))
 
-        for i in range(ticket['quantity']):
+        for i in range(ticket.quantity):
             qr_id = str(uuid.uuid4())
             qr_data = f'entrada_id:{qr_id},evento:{event.id},usuario:{user.id}'
             qr = qrcode.make(qr_data)
@@ -63,6 +64,7 @@ def send_email(ticket, user_id):
         return {"success": True}
 
     except Exception as e:
+        print('Error', {e})
         return {"success": False, "error": str(e)}
     finally:
         db.close
