@@ -7,7 +7,9 @@ const formatDate = (dateString: string) => {
   const day = date.getDate().toString().padStart(2, "0");
   const month = date.toLocaleString("es", { month: "short" });
   const year = date.getFullYear();
-  return { day, month, year };
+  const hour = date.getHours().toString().padStart(2, "0");
+  const minute = date.getMinutes().toString().padStart(2, "0");
+  return { day, month, year, hour, minute };
 };
 
 const EventCard = ({
@@ -17,11 +19,13 @@ const EventCard = ({
   location,
   image,
   estado,
+  capacity,
+  tickets_sold,
 }: Event) => {
   const navigate = useNavigate();
-  const { day, month, year } = formatDate(date);
+  const { day, month, year, hour, minute } = formatDate(date);
 
-  const available = estado === "disponible"; // ajusta según tu lógica de estado
+  const available = estado === "activo" && tickets_sold < capacity;
 
   const handleCardClick = () => {
     if (available) {
@@ -66,10 +70,19 @@ const EventCard = ({
         </div>
 
         <div className="flex justify-center items-center gap-6 text-center text-gray-800 dark:text-gray-100 mt-4">
+          {/* Fecha */}
           <div>
             <p className="text-2xl font-bold">{day}</p>
             <p className="text-sm uppercase">{month}</p>
             <p className="text-xs">{year}</p>
+          </div>
+
+          {/* Separador */}
+          <div className="w-px h-10 bg-gray-300 dark:bg-gray-600" />
+
+          {/* Hora */}
+          <div>
+            <p className="text-2xl uppercase font-bold">{hour}:{minute}</p>
           </div>
         </div>
       </div>

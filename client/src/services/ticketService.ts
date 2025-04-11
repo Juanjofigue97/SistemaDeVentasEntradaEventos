@@ -13,10 +13,51 @@ export const getAllTickets = async (): Promise<Ticket[]> => {
 };
 
 export const buyTicket = async (ticket: TicketCreate): Promise<Ticket> => {
+  const token = localStorage.getItem("token");
   const response = await axios.post(`${API_URL}/tickets`, ticket, {
     headers: {
       "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
     },
   });
+  return response.data;
+};
+
+export const validateDiscount = async ({
+  event_id,
+  entry_type_id,
+  quantity,
+  discount_code,
+}: {
+  event_id: number;
+  entry_type_id: number;
+  quantity: number;
+  discount_code: string;
+}): Promise<{
+  valid: boolean;
+  price_per_ticket: number;
+  discount_percentage: number;
+  final_price: number;
+  quantity: number;
+}> => {
+  const token = localStorage.getItem("token");
+
+  const response = await axios.get(`${API_URL}/tickets/validate-discount`, {
+    params: {
+      event_id,
+      entry_type_id,
+      quantity,
+      discount_code,
+    },
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  return response.data;
+};
+
+export const getEntryTypesByEvent = async (eventId: number) => {
+  const response = await axios.get(`${API_URL}/admin/entradas?event_id=${eventId}`);
   return response.data;
 };

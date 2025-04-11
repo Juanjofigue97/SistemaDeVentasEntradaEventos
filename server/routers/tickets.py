@@ -1,5 +1,5 @@
 #Compra y gestión de entradas
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 from database import SessionLocal
 from models import Ticket, Event, Discount, User, EntryType
@@ -82,3 +82,47 @@ def buy_ticket(
     db.refresh(new_ticket)
     send_email(new_ticket, current_user.id)
     return new_ticket
+
+@router.get("/validate-discount")
+def validate_discount(
+    event_id: int = Query(...),
+    entry_type_id: int = Query(...),
+    quantity: int = Query(...),
+    discount_code: str = Query(...),
+    db: Session = Depends(get_db)
+):
+    # Verificar evento
+    event = db.query(Event).filter(Event.id == event_id).first()
+    if not event:
+        raise HTTPException(status_code=404, detail="Evento no encontrado")
+
+    # Verificar tipo de entrada
+    entry_type = db.query(EntryType).filter(
+        EntryType.id == entry_type_id,
+        EntryType.event_id == event.id
+    ).first()
+    if not entry_type:
+        raise HTTPException(status_code=404, detail="Tipo de entrada no válido para este evento")
+
+    # Calcular precio
+    price_per_ticket = entry_type.price
+    discount = db.query(Discount).filter(
+        Discount.code == discount_code,
+        Discount.is_active == True
+    ).first()
+
+    if not discount:
+        raise HTTPException(status_code=400, detail="Código de descuento inválido")
+
+    discount_percentage = discount.percentage
+    discount_amount = price_per_ticket * (discount.percentage / 100)
+    final_price = (price_per_ticket - discount_amount) * quantity
+
+    return {
+        "valid": True,
+        "price_per_ticket": price_per_ticket,
+        "discount_percentage": discount_percentage,
+        "final_price": final_price,
+        "quantity": quantity
+    }
+

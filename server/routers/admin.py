@@ -1,4 +1,8 @@
 # admin.py
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
 
 from fastapi import APIRouter, HTTPException, Depends, UploadFile, File, Form
 from sqlalchemy.orm import Session
@@ -9,7 +13,16 @@ import shutil
 import os
 
 import models, schemas
+import cloudinary
+import cloudinary.uploader
+from cloudinary.utils import cloudinary_url
 
+cloudinary.config(
+    cloud_name=os.getenv("CLOUDINARY_CLOUD_NAME"),
+    api_key=os.getenv("CLOUDINARY_API_KEY"),
+    api_secret=os.getenv("CLOUDINARY_API_SECRET"),
+    secure=True
+)
 
 router = APIRouter(prefix="/admin", tags=["Admin"])
 
@@ -22,7 +35,6 @@ def get_db():
 
 # Crear evento
 @router.post("/eventos", response_model=schemas.EventOut)
-
 async def crear_evento(
     name: str = Form(...),
     description: str = Form(...),
@@ -35,14 +47,10 @@ async def crear_evento(
     db: Session = Depends(get_db)
 ):
     try:
-        filename = f"img_{image.filename}"
-        image_path = os.path.join("static", "images", filename).replace("\\", "/")
+        # Subir imagen a Cloudinary
+        cloudinary_response = cloudinary.uploader.upload(image.file)
+        image_url = cloudinary_response.get("secure_url")
 
-        # Guardar imagen
-        with open(image_path, "wb") as buffer:
-            shutil.copyfileobj(image.file, buffer)
-
-        # Crear evento en la base de datos
         nuevo_evento = models.Event(
             name=name,
             description=description,
@@ -50,7 +58,7 @@ async def crear_evento(
             location=location,
             price=price,
             capacity=capacity,
-            image=image_path,  # Guardás la ruta relativa o absoluta
+            image=image_url,  # Guardamos la URL
             estado=estado
         )
 
@@ -59,6 +67,7 @@ async def crear_evento(
         db.refresh(nuevo_evento)
 
         return nuevo_evento
+
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error al crear evento: {e}")
 
@@ -89,18 +98,14 @@ async def actualizar_evento(
     evento.estado = estado
 
     if image:
-        # Guardar nueva imagen
-        filename = f"img_{image.filename}"
-        image_path = os.path.join("static", "images", filename).replace("\\", "/")
+        # Subir nueva imagen a Cloudinary
+        result = cloudinary.uploader.upload(image.file, folder="eventia/images")
+        image_url = result.get("secure_url")
 
-        with open(image_path, "wb") as buffer:
-            shutil.copyfileobj(image.file, buffer)
+        # Eliminar imagen anterior si deseas (opcional y si guardabas URL anterior)
+        # Cloudinary no elimina automáticamente a menos que lo hagas manual
 
-        # Opcional: eliminar la imagen anterior si existe
-        if evento.image and os.path.exists(evento.image):
-            os.remove(evento.image)
-
-        evento.image = image_path
+        evento.image = image_url
 
     db.commit()
     db.refresh(evento)
