@@ -2,7 +2,7 @@ from fastapi import FastAPI, Request
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse
-from routers import auth, events, tickets, users, admin, upload
+from routers import auth, events, tickets, users, admin
 from database import Base, engine
 import uvicorn
 from fastapi.middleware.cors import CORSMiddleware
