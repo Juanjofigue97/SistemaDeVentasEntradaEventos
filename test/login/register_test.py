@@ -4,8 +4,7 @@ from selenium.webdriver.common.by import By
 import time
 
 # Configuración
-service = Service("E:/geckodriver.exe")
-driver = webdriver.Firefox(service=service)
+driver = webdriver.Firefox()
 
 # 1. Abrir la app
 driver.get("https://eventia-venta-entradas.up.railway.app/")
@@ -63,5 +62,5 @@ except Exception as e:
     print("❌ Error al iniciar sesión:", e)
 
 # 6. Esperar y cerrar navegador
-time.sleep(5)
+time.sleep(2)
 driver.quit()

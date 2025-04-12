@@ -4,8 +4,7 @@ from selenium.webdriver.common.by import By
 import time
 
 # Ruta a geckodriver
-service = Service("E:/geckodriver.exe")
-driver = webdriver.Firefox(service=service)
+driver = webdriver.Firefox()
 
 # 1. Abre la app
 driver.get("https://eventia-venta-entradas.up.railway.app/")
