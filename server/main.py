@@ -32,7 +32,6 @@ app.add_middleware(
 )
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
-app.include_router(upload.router)
 app.include_router(auth.router)
 app.include_router(events.router)
 app.include_router(tickets.router)
