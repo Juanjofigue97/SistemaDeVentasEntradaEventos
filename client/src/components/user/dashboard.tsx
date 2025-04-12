@@ -1,6 +1,5 @@
 import { Link, Outlet, useLocation } from "react-router-dom";
 import { HiCalendar, HiUser, HiShoppingBag, HiOutlineDotsVertical, HiX } from "react-icons/hi";
-import logo from "/EventiaDark.png";
 import { useState } from "react";
 import { useAuth } from "../../context/AuthContext";
 
@@ -22,7 +21,7 @@ export default function Dashboard() {
       <div className={`fixed top-0 left-0 z-50 h-full w-64 bg-gray-700 text-white p-4 border-r border-yellow-500 transition-transform transform ${menuOpen ? "translate-x-0" : "-translate-x-full"} md:translate-x-0 md:static md:flex-shrink-0`}>
         <div className="flex justify-between items-center mb-8">
           <Link to="/">
-            <img src={logo} alt="logo" className="h-10 w-auto" />
+            <img src="/EventiaDark.png" alt="logo" className="h-10 w-auto" />
           </Link>
           <button className="text-white text-2xl md:hidden" onClick={() => setMenuOpen(false)}>
             <HiX />

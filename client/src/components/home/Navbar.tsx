@@ -2,7 +2,6 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { FaUserCircle } from "react-icons/fa";
 import { useAuth } from "../../context/AuthContext";
-import logo from "/EventiaDark.png";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -21,7 +20,7 @@ const Navbar = () => {
       <div className="max-w-screen-xl mx-auto flex items-center justify-between p-4 relative">
         {/* Logo */}
         <Link to="/" className="flex items-center">
-          <img src={logo} alt="logo" className="h-20 w-auto" />
+          <img src="/EventiaDark.png" alt="logo" className="h-20 w-auto" />
         </Link>
 
         {/* Center links (Desktop) */}

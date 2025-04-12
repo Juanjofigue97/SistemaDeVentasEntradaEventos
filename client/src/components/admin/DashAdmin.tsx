@@ -9,7 +9,6 @@ import {
   HiClipboardList,
 } from "react-icons/hi";
 import { Link, useNavigate } from "react-router-dom";
-import logo from "/EventiaDark.png";
 import { useAuth } from "../../context/AuthContext";
 import UserList from "./UserList";
 import EventList from "./EventList";
@@ -42,7 +41,7 @@ export default function AdminDashboard() {
       >
         <div className="flex justify-between items-center mb-8">
           <Link to="/">
-            <img src={logo} alt="logo" className="h-10 w-auto" />
+            <img src="/EventiaDark.png" alt="logo" className="h-10 w-auto" />
           </Link>
           <button
             className="text-white text-2xl md:hidden"
